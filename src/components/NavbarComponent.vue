@@ -1,11 +1,11 @@
 <template>
   <div>
-    <ul class="nav justify-content-between p-3">
+    <ul class="nav justify-content-between align-items-center p-3 shadow">
       <li class="nav-item">
         <img alt="Reflective Learning logo" src="../assets/rl-icon.png" />
       </li>
       <li class="nav-item">
-        <h1>MemeHub</h1>
+        <h1 class="mb-0">MemeHub</h1>
       </li>
     </ul>
   </div>

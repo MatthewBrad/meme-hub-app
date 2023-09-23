@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="navbar w-100 d-block">
     <ul class="nav justify-content-between align-items-center p-3 shadow">
       <li class="nav-item">
         <img alt="Reflective Learning logo" src="../assets/rl-icon.png" />
@@ -18,6 +18,14 @@ export default {
 </script>
 
 <style lang="sass" scoped>
+.navbar
+  position: sticky
+  top: 0
+  left: 0
+  right: 0
+  z-index: 100
+  background-color: white
+
 img
   max-width: 150px
 </style>

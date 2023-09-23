@@ -1,8 +1,10 @@
 <template>
   <!-- <img alt="Vue logo" src="./assets/logo.png" /> -->
   <!-- <HelloWorld msg="Welcome to Your Vue.js App" /> -->
-  <navbar-component></navbar-component>
-  <meme-form></meme-form>
+  <div>
+    <navbar-component></navbar-component>
+    <meme-form></meme-form>
+  </div>
 </template>
 
 <script>

@@ -1,11 +1,8 @@
 <template>
-  <div class="navbar w-100 d-block">
-    <ul class="nav justify-content-between align-items-center p-3 shadow">
+  <div class="navbar w-100 d-block shadow bg-black">
+    <ul class="nav justify-content-center align-items-center p-3">
       <li class="nav-item">
-        <img alt="Reflective Learning logo" src="../assets/rl-icon.png" />
-      </li>
-      <li class="nav-item">
-        <h1 class="mb-0">MemeHub</h1>
+        <h1 class="mb-0 text-white">TheMemeHub</h1>
       </li>
     </ul>
   </div>

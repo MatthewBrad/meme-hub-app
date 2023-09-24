@@ -1,9 +1,10 @@
 <template>
   <div class="row app-content-container mx-auto">
-    <div class="col-12">
+    <div class="col-12" id="memeForm">
       <form
         class="meme-uploader-form mx-auto needs-validation"
         @submit.prevent="handleSubmit"
+        novalidate
       >
         <h2 class="mb-4 text-center">My Favourite Memes</h2>
 
@@ -25,7 +26,7 @@
         </div>
 
         <!-- meme title -->
-        <div class="form-floating mb-3">
+        <div class="form-floating mb-3 has-validation">
           <input
             type="text"
             class="form-control ps-3"
@@ -35,18 +36,22 @@
             v-model="title"
           />
           <label for="memeTitle" class="ps-3">Meme Title</label>
+          <div class="invalid-feedback">Please enter your Meme Title.</div>
         </div>
 
         <!-- meme description -->
         <div class="form-floating mb-3">
           <textarea
-            class="form-control ps-3"
+            class="form-control ps-3 has-validation"
             placeholder="Leave a comment here"
             required
             id="memeDescription"
             v-model="description"
           ></textarea>
           <label for="memeDescription" class="ps-3">Reason this is funny</label>
+          <div class="invalid-feedback">
+            Please enter your Meme Description.
+          </div>
         </div>
 
         <button
@@ -55,6 +60,18 @@
         >
           Add
         </button>
+        <div
+          v-if="memes.length > 0"
+          class="alert alert-success text-center mt-4"
+          role="alert"
+        >
+          Please click
+          <a href="#bottom" class="text-success">here</a> to view your latest
+          upload.
+        </div>
+        <div v-else class="alert alert-success text-center mt-4" role="alert">
+          There are no memes uploaded yet...
+        </div>
       </form>
     </div>
     <div class="col-12">
@@ -63,7 +80,7 @@
           <!-- saved meme section -->
           <h2 class="text-center mb-4">Uploaded Memes:</h2>
           <div
-            class="d-flex justify-content-between align-items-start flex-column flex-md-row mb-4"
+            class="d-flex justify-content-center justify-content-md-between align-content-center align-items-md-start flex-column flex-md-row mb-4 pt-4 saved-meme-loop-block"
             v-for="(meme, index) in memes"
             :key="index"
           >
@@ -72,25 +89,62 @@
               :src="meme.data"
               alt="Meme Image"
             />
-            <p class="mb-2 mb-md-0 mx-0 mx-md-2">
-              <span class="fw-bold">Title:</span><br />
-              {{ meme.title }}
-            </p>
-            <p class="mb-2 mb-md-0 mx-0 mx-md-2">
-              <span class="fw-bold">Description:</span><br />
-              {{ meme.description }}
-            </p>
-            <button
-              class="btn add-btn rounded-pill px-4 btn-delete mx-0 mx-md-2"
-              @click="deleteMeme(index)"
-            >
-              Delete
-            </button>
+
+            <div class="mx-0 mx-md-2">
+              <p class="mb-2 mb-md-0">
+                <span class="fw-bold"
+                  >{{ meme.editing ? "Editing Title" : "Title" }}:</span
+                ><br />
+
+                {{ meme.editing ? meme.updatedTitle : meme.title }}
+              </p>
+              <input
+                v-if="meme.editing"
+                v-model="meme.updatedTitle"
+                class="form-control mt-2"
+              />
+            </div>
+            <div class="mx-0 mx-md-2">
+              <p class="mb-2 mb-md-0 text-break flex-grow-1">
+                <span class="fw-bold"
+                  >{{
+                    meme.editing ? "Editing Description" : "Description"
+                  }}:</span
+                ><br />
+
+                {{ meme.editing ? meme.updatedDescription : meme.description }}
+              </p>
+              <input
+                v-if="meme.editing"
+                v-model="meme.updatedDescription"
+                class="form-control mt-2"
+              />
+            </div>
+            <div class="text-center mt-3 mt-md-0">
+              <button
+                class="btn bg-black mb-2 mb-sm-0 mb-md-2 rounded-pill px-4 mx-0 mx-md-2"
+                @click="editMeme(index)"
+              >
+                Edit
+              </button>
+              <button
+                v-if="meme.editing"
+                class="btn btn-success mb-2 mb-sm-0 mb-md-2 rounded-pill px-4 mx-0 mx-md-2"
+                @click="saveMeme(index)"
+              >
+                Save
+              </button>
+              <button
+                class="btn add-btn rounded-pill px-4 btn-delete mx-0 mx-md-2"
+                @click="deleteMeme(index)"
+              >
+                Delete
+                <i class="bi bi-trash3"></i>
+              </button>
+            </div>
           </div>
         </div>
-        <div v-else class="alert alert-success text-center" role="alert">
-          There are no memes uploaded yet...
-        </div>
+        <span id="bottom"></span>
       </div>
     </div>
   </div>
@@ -101,8 +155,25 @@ import { ref } from "vue";
 import { useMemeStore } from "../store/store";
 
 export default {
+  name: "Meme-Form",
   setup() {
     const memeStore = useMemeStore();
+
+    const editMeme = (index) => {
+      const meme = memeStore.memes[index];
+      meme.editing = true;
+      meme.updatedTitle = meme.title;
+      meme.updatedDescription = meme.description;
+    };
+
+    const saveMeme = (index) => {
+      const meme = memeStore.memes[index];
+      meme.title = meme.updatedTitle;
+      meme.description = meme.updatedDescription;
+      meme.editing = false;
+      memeStore.persistMemes();
+    };
+
     const meme = ref(null);
     const title = ref("");
     const description = ref("");
@@ -127,12 +198,13 @@ export default {
           memeStore.addMeme(memeData);
 
           // creset input fields
-          meme.value = null;
+          meme.value = "";
           title.value = "";
           description.value = "";
         };
 
         reader.readAsDataURL(meme.value);
+        location.reload();
       }
     };
 
@@ -151,6 +223,9 @@ export default {
       handleSubmit,
       deleteMeme,
       memes,
+      memeStore,
+      editMeme,
+      saveMeme,
     };
   },
 };
@@ -165,12 +240,11 @@ $primary-red: #E13126
 $secondary-red: #C02926
 
 .app-content-container
-  max-width: 700px
+  max-width: 900px
   position: relative
   z-index: 50
 .meme-uploader-form
-    margin-top: 60px
-    max-width: 400px
+    margin-top: 30px
 
     textarea, input, .file-upload-input label
         border: 0
@@ -195,6 +269,9 @@ $secondary-red: #C02926
   max-width: 150px
   width: 100%
 
+  @media (max-width: 575.98px)
+      max-width: 100%
+
   &:hover
     transition: 0.4s ease
     transform: translateY(-3px)
@@ -218,4 +295,11 @@ $secondary-red: #C02926
 
   img
     max-width: 250px
+    width: 100%
+
+    @media (max-width: 575.98px)
+      max-width: 100%
+
+.saved-meme-loop-block + .saved-meme-loop-block
+  border-top: 1px grey solid
 </style>
